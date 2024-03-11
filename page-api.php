@@ -79,8 +79,9 @@ $api = new Api();
 $args = [
     'post_type' => 'post', // Specify the post type
     'post_status' => 'publish', // Fetch only published posts
-    'posts_per_page' => -1, // Fetch all posts (use -1 to retrieve all posts)
+    'posts_per_page' =>  $_GET['per_page'] ? $_GET['per_page'] : -1, // Fetch all posts (use -1 to retrieve all posts)
 ];
+
 
 switch($target) {
     case 'posts':
@@ -94,4 +95,3 @@ switch($target) {
         $api->get_categories($args);
     break;
 }
-
