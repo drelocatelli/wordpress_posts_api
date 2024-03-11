@@ -1,5 +1,8 @@
-http://localhost/api/?target=pages
+GET http://localhost/api/?target=pages HTTP/1.1
+content-type: application/json
 
-http://localhost/api/?target=posts
+GET http://localhost/api/?target=posts HTTP/1.1
+content-type: application/json
 
-http://localhost/api/?target=categories
+GET http://localhost/api/?target=categories HTTP/1.1
+content-type: application/json
