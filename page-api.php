@@ -6,63 +6,67 @@ $target = $_GET['target'];
 
 class Api {
 
-    private function get($args, $category, $page_num) 
-    {
-        if(isset($category)) {
-            $args['category_name'] = $category;
-        } 
+    private function get($args, $category, $page_num, $search_name) 
+{
+    if(isset($category)) {
+        $args['category_name'] = $category;
+    } 
 
-        if(isset($page_num)) {
-            $args['paged'] = $page_num ?? 1;
-        }
-        
-        $posts = get_posts($args);
-
-        foreach ( $posts as $post ) {
-            setup_postdata( $post );
-
-            $post_data = [
-                'title' => get_the_title($post->ID),
-                'permalink' => get_the_permalink( $post->ID ),
-                'date' => $post->post_date,
-                'excerpt' => strip_tags(get_the_excerpt($post->ID)),
-                'thumbnail' => get_the_post_thumbnail($post->ID),
-                'content' => get_the_content( $post->ID ),
-                
-                // Add more post data as needed
-            ];
-
-            if($page_num && $args['posts_per_page']) {
-                $post_data['pagination'] = [
-                    "current_page" => $page_num ?? null,
-                    "per_page" => $args['posts_per_page'] ?? null,
-                    "length" => count($posts),
-                ];
-            }
-
-            if(isset($args['category_name'])) {
-                $post_data['category_name'] = $args['category_name'];
-            } 
-
-            // Add post data to the array
-            $posts_data[] = $post_data;
-        }
-        wp_reset_postdata(); // Restore original post data
-        
-        // Convert page data to JSON format
-        $json_data = json_encode( $posts_data );
-        
-        // Output JSON data
-        echo $json_data;
+    if(isset($page_num)) {
+        $args['paged'] = $page_num ?? 1;
+    }
+    
+    if(isset($search_name)) {
+        $args['s'] = $search_name;
     }
 
-    public function get_posts($args, $category, $page_num) {
-        $this->get($args, $category, $page_num);
+    $posts = get_posts($args);
+
+    foreach ( $posts as $post ) {
+        setup_postdata( $post );
+
+        $post_data = [
+            'title' => get_the_title($post->ID),
+            'permalink' => get_the_permalink( $post->ID ),
+            'date' => $post->post_date,
+            'excerpt' => strip_tags(get_the_excerpt($post->ID)),
+            'thumbnail' => get_the_post_thumbnail($post->ID),
+            'content' => get_the_content( $post->ID ),
+            
+            // Add more post data as needed
+        ];
+
+        if($page_num && $args['posts_per_page']) {
+            $post_data['pagination'] = [
+                "current_page" => $page_num ?? null,
+                "per_page" => $args['posts_per_page'] ?? null,
+                "length" => count($posts),
+            ];
+        }
+
+        if(isset($args['category_name'])) {
+            $post_data['category_name'] = $args['category_name'];
+        } 
+
+        // Add post data to the array
+        $posts_data[] = $post_data;
+    }
+    wp_reset_postdata(); // Restore original post data
+    
+    // Convert page data to JSON format
+    $json_data = json_encode( $posts_data );
+    
+    // Output JSON data
+    echo $json_data;
+}
+
+    public function get_posts($args, $category, $page_num, $search_name) {
+        $this->get($args, $category, $page_num, $search_name);
     }
 
     public function get_pages($args, $category, $page_num)
     {
-        $this->get($args, $category, $page_num);
+        $this->get($args, null, null, null);
     }
 
     public function get_categories()
@@ -107,7 +111,7 @@ $args = [
 
 switch($target) {
     case 'posts':
-        $api->get_posts($args, $_GET['category'], $_GET['page_num']);
+        $api->get_posts($args, $_GET['category'], $_GET['page_num'], $_GET['search_name']);
     break;
     case 'pages':
         $args['post_type'] = 'page';
