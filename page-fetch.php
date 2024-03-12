@@ -77,7 +77,7 @@
         
         params.set('target', 'posts');
         params.set('page_num', options?.pageNum ? options.pageNum : params.get('page_num') ? params.get('page_num') : 1);
-        params.set('per_page', options?.perPage ? options.perPage : params.get('per_page') ? params.get('per_page') : 1);
+        params.set('per_page', options?.perPage ? options.perPage : params.get('per_page') ? params.get('per_page') : perPage);
 
         if(options?.searchName) params.set('search_name', options?.searchName );
         if(options?.category) params.set('category', options.category );
