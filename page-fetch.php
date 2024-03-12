@@ -166,7 +166,6 @@
 
         paginationEl.appendChild(paginationCountEl)
 
-        console.log(length)
     }
     
     document.addEventListener('DOMContentLoaded', async () => {
