@@ -22,25 +22,24 @@ class Api {
 
     $posts = get_posts($args);
 
-    $all_posts = [];
+    $all_posts = [
+        "articles" => []
+    ];
 
     foreach ( $posts as $post ) {
         setup_postdata( $post );
 
         $post_data = [
-            (array) [
-                'title' => get_the_title($post->ID),
-                'permalink' => get_the_permalink( $post->ID ),
-                'date' => $post->post_date,
-                'excerpt' => strip_tags(get_the_excerpt($post->ID)),
-                'thumbnail' => get_the_post_thumbnail($post->ID),
-                'content' => get_the_content( $post->ID ),
-                
-                // Add more post data as needed
-            ]
+            'title' => get_the_title($post->ID),
+            'permalink' => get_the_permalink( $post->ID ),
+            'date' => $post->post_date,
+            'excerpt' => strip_tags(get_the_excerpt($post->ID)),
+            'thumbnail' => get_the_post_thumbnail($post->ID),
+            'content' => get_the_content( $post->ID ),
+            // Add more post data as needed
         ];
 
-        array_push($all_posts, $post_data);
+        array_push($all_posts["articles"], $post_data);
 
         if($page_num && $args['posts_per_page']) {
             $all_posts['pagination'] = [
