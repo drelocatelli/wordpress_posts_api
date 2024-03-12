@@ -22,22 +22,28 @@ class Api {
 
     $posts = get_posts($args);
 
+    $all_posts = [];
+
     foreach ( $posts as $post ) {
         setup_postdata( $post );
 
         $post_data = [
-            'title' => get_the_title($post->ID),
-            'permalink' => get_the_permalink( $post->ID ),
-            'date' => $post->post_date,
-            'excerpt' => strip_tags(get_the_excerpt($post->ID)),
-            'thumbnail' => get_the_post_thumbnail($post->ID),
-            'content' => get_the_content( $post->ID ),
-            
-            // Add more post data as needed
+            (array) [
+                'title' => get_the_title($post->ID),
+                'permalink' => get_the_permalink( $post->ID ),
+                'date' => $post->post_date,
+                'excerpt' => strip_tags(get_the_excerpt($post->ID)),
+                'thumbnail' => get_the_post_thumbnail($post->ID),
+                'content' => get_the_content( $post->ID ),
+                
+                // Add more post data as needed
+            ]
         ];
 
+        array_push($all_posts, $post_data);
+
         if($page_num && $args['posts_per_page']) {
-            $post_data['pagination'] = [
+            $all_posts['pagination'] = [
                 "current_page" => $page_num ?? null,
                 "per_page" => $args['posts_per_page'] ?? null,
                 "length" => count($posts),
@@ -48,13 +54,11 @@ class Api {
             $post_data['category_name'] = $args['category_name'];
         } 
 
-        // Add post data to the array
-        $posts_data[] = $post_data;
     }
     wp_reset_postdata(); // Restore original post data
     
     // Convert page data to JSON format
-    $json_data = json_encode( $posts_data );
+    $json_data = json_encode( $all_posts );
     
     // Output JSON data
     echo $json_data;
