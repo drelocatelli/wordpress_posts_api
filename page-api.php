@@ -14,10 +14,11 @@ class Api {
         
         foreach ( $pages as $page ) {
             setup_postdata( $page );
-        
-            // Get page data
+
             $page_data = array(
                 'title' => get_the_title( $page->ID ),
+                'excerpt' => strip_tags(get_the_excerpt($page->ID)),
+                'thumbnail' => get_the_post_thumbnail($page->ID),
                 'content' => get_the_content( $page->ID ),
                 // Add more page data as needed
             );
