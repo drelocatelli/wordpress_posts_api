@@ -26,6 +26,12 @@ class Api {
         "articles" => []
     ];
 
+    $all_posts_query = get_posts([
+        'post_type' => 'post',
+        'post_status'    => 'publish',
+        'posts_per_page' => -1,
+    ]);
+
     foreach ( $posts as $post ) {
         setup_postdata( $post );
 
@@ -46,6 +52,7 @@ class Api {
                 "current_page" => $page_num ?? null,
                 "per_page" => $args['posts_per_page'] ?? null,
                 "length" => count($posts),
+                "total_posts" => count($all_posts_query),
             ];
         }
 
