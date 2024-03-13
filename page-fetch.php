@@ -20,6 +20,7 @@
     </div>
 </div>
 
+
 <script>
     const postLoadingEl = document.querySelector('.post-loading');
     const perPage = 2;
@@ -27,7 +28,7 @@
 
     function loadCategories() {
         const categoryIn = document.querySelector('select[name="category"]');
-        fetch('/api?target=categories')
+        fetch('<?= site_url(); ?>/api?target=categories')
             .then((response) => response.json())
             .then((response) => {
                 categoryIn.innerHTML = '';
@@ -85,11 +86,15 @@
         try {
             postLoadingEl.innerHTML = 'Carregando...';
 
-            let response = await fetch(`/api?${params.toString()}`);
+            let response = await fetch(`<?= site_url(); ?>/api?${params.toString()}`);
             response = await response.json();
 
             setPostDiv(response.articles);
             makePagination(response.pagination, response.articles.length);
+
+            const newParamsString = params.toString();
+            const newURL = newParamsString ? `${window.location.pathname}?${newParamsString}` : window.location.pathname;
+            history.pushState(null, '', newURL);
 
         } catch(err) {
             console.error(err);
@@ -135,13 +140,16 @@
 
         if(pagination?.per_page !== -1) {
             paginationEl.innerHTML = '';
-            for(let i = 1; i <= pagination?.length; i++) {
-                const pageItem = document.createElement('a');
-                pageItem.innerText = i;
-                pageItem.href = "javascript:void(1);";
-                pageItem.classList.add('page');
-                
-                paginationEl.appendChild(pageItem);
+            if(Number(pagination?.per_page) !== pagination?.total_posts) {
+                for(let i = 1; i <= pagination?.length; i++) {
+                    const pageItem = document.createElement('a');
+                    pageItem.innerText = i;
+                    pageItem.href = "javascript:void(0);";
+                    pageItem.classList.add('page');
+                    
+                    paginationEl.appendChild(pageItem);
+                }
+
             }
         }
 
@@ -154,7 +162,7 @@
         const paginationLinksEl = paginationEl.querySelectorAll('a.page');
         paginationLinksEl.forEach(async (link) => {
             link.addEventListener('click', async() => {
-                params.set('per_page', link.innerText);
+                params.set('per_page', params.get('per_page'));
                 const newParamsString = params.toString();
 
                 await loadPosts({ pageNum: link.innerText });
