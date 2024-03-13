@@ -137,20 +137,21 @@
 
     async function makePagination(pagination, length) {
         const paginationEl = document.querySelector('#content_posts .pagination');
+        paginationEl.innerHTML = '';
 
-        if(pagination?.per_page !== -1) {
-            paginationEl.innerHTML = '';
-            if(Number(pagination?.per_page) !== pagination?.total_posts) {
-                for(let i = 1; i <= pagination?.length; i++) {
-                    const pageItem = document.createElement('a');
-                    pageItem.innerText = i;
-                    pageItem.href = "javascript:void(0);";
-                    pageItem.classList.add('page');
-                    
-                    paginationEl.appendChild(pageItem);
-                }
+        const totalPages = Math.ceil(pagination.total_posts / pagination.per_page);
+        
+        for (let i = 1; i <= totalPages; i++) {
+            const pageItem = document.createElement('a');
+            pageItem.innerText = i;
+            pageItem.href = "javascript:void(0);";
+            pageItem.classList.add('page');
 
+            if (i === Number(pagination.current_page)) {
+                pageItem.classList.add('active');
             }
+
+            paginationEl.appendChild(pageItem);
         }
 
         makePageLink(paginationEl, length);
