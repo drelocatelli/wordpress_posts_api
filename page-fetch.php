@@ -139,7 +139,7 @@
         const paginationEl = document.querySelector('#content_posts .pagination');
         paginationEl.innerHTML = '';
 
-        const totalPages = Math.ceil(pagination.total_posts / pagination.per_page);
+        const totalPages = Math.ceil(pagination?.total_posts / pagination.per_page) ?? 0;
         
         for (let i = 1; i <= totalPages; i++) {
             const pageItem = document.createElement('a');
