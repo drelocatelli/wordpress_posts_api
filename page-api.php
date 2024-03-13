@@ -8,7 +8,14 @@ class Api {
 
     private function get($args, $category, $page_num, $search_name) 
 {
+    $all_posts_args = [
+        'post_type' => 'post',
+        'post_status'    => 'publish',
+        'posts_per_page' => -1,
+    ];
+
     if(isset($category)) {
+        $all_posts_args['category_name'] = $category;
         $args['category_name'] = $category;
     } 
 
@@ -23,14 +30,10 @@ class Api {
     $posts = get_posts($args);
 
     $all_posts = [
-        "articles" => []
+        "articles" => [],
     ];
 
-    $all_posts_query = get_posts([
-        'post_type' => 'post',
-        'post_status'    => 'publish',
-        'posts_per_page' => -1,
-    ]);
+    $all_posts_query = get_posts($all_posts_args);
 
     foreach ( $posts as $post ) {
         setup_postdata( $post );
