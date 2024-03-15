@@ -126,7 +126,20 @@
             
             divPostEl.appendChild(titleEl);
             divPostEl.appendChild(thumbnailEl);
-            divPostEl.appendChild(dateEL);
+            let date = new Date(post?.date);
+            date = new Date(date.getTime() - (3 * 60 * 60 * 1000));
+            date = date.toLocaleString('pt-BR', { 
+                year: 'numeric', 
+                month: '2-digit', 
+                day: '2-digit', 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                second: '2-digit',
+                hour12: false,
+                timeZone: 'America/Sao_Paulo' // Brasília Time (BRT)
+            });
+
+            dateEL.innerHTML = date;
             divPostEl.appendChild(contentEl);
             divPostEl.innerHTML = `<a href="${post?.permalink}">${divPostEl.innerHTML}</a>`;
 
