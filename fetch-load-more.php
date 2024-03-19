@@ -1,5 +1,5 @@
  <div class="container">
-    <h5 class="title-noticia" style="margin-top: 25px;">Sessão ordinária </h5>
+    <h5 class="title-noticia" style="margin-top: 25px;">Titulo </h5>
     <div id="content_posts">
         <form id="get_posts" method="get">
             <input type="search" name="keyword" placeholder="Digite sua busca...">
