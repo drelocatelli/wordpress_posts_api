@@ -82,7 +82,8 @@
     async function loadPosts(options) {
         
         params.set('target', 'posts');
-        params.set('page_num', params.get('page_num') ? Number(params.get('page_num')) : 0);
+        const newPageNum = Number(params.get('page_num')) === 1 ? 0 : Number(params.get('page_num')) + 1;
+        params.set('page_num', params.get('page_num') ? newPageNum : 1);
         params.set('per_page', options?.perPage ? options.perPage : params.get('per_page') ? params.get('per_page') : perPage);
 
         if(options?.searchName) params.set('search_name', options?.searchName );
