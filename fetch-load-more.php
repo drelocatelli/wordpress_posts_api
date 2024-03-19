@@ -1,8 +1,4 @@
-<?php
-get_header();
-?>
-<?php include('__header_menu.php'); ?>
-<div class="container">
+ <div class="container">
     <h5 class="title-noticia" style="margin-top: 25px;">Sessão ordinária </h5>
     <div id="content_posts">
         <form id="get_posts" method="get">
@@ -288,8 +284,3 @@ get_header();
         -webkit-box-orient: vertical;
     }
 </style>
-
-<?php include('__section_footer.php'); ?>
-<?
-
-get_footer();
