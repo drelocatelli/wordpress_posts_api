@@ -1,5 +1,5 @@
 <div class="container">
-    <h5 class="title-noticia" style="margin-top: 25px;"><?= $search_title;  ?> </h5>
+    <h5 class="title-noticia" style="margin-top: 25px;">title </h5>
     <div id="content_posts">
         <form id="get_posts" method="get">
             <input type="search" name="keyword" placeholder="Palavras-Chave">
@@ -27,7 +27,7 @@
     const perPage = 8;
     const params = new URLSearchParams(window.location.search);
     const postEntryEl = document.querySelector('.post-entry');
-    let currentCategory = '<?= $search_name;  ?>'
+    let currentCategory = ''
 
     function loadCategories() {
         const categoryIn = document.querySelector('select[name="category"]');
