@@ -22,6 +22,7 @@
 </div>
 
 <script>
+    const form = document.querySelector('form#get_posts');
     const postLoadingEl = document.querySelector('.post-loading');
     const perPage = 8;
     const params = new URLSearchParams(window.location.search);
@@ -49,7 +50,6 @@
     }
     
     async function search(e) {
-        const form = document.querySelector('form#get_posts');
         form.onsubmit = async(e) => {
             e.preventDefault();
             
@@ -82,8 +82,7 @@
     async function loadPosts(options) {
         
         params.set('target', 'posts');
-        const newPageNum = Number(params.get('page_num')) === 1 ? 0 : Number(params.get('page_num')) + 1;
-        params.set('page_num', params.get('page_num') ? newPageNum : 1);
+        params.set('page_num', params.get('page_num') == '-1' ? '1' : Number(params.get('page_num')) + 1);
         params.set('per_page', options?.perPage ? options.perPage : params.get('per_page') ? params.get('per_page') : perPage);
 
         if(options?.searchName) params.set('search_name', options?.searchName );
@@ -104,7 +103,7 @@
             
             if(params.get('category') !== currentCategory) {
                 currentCategory = params.get('category');
-                params.set('page_num', '1');
+                params.set('page_num', '-1');
                 append = false;
             }
             postLoadingEl.style.display = 'none';
@@ -128,7 +127,9 @@
         
         if(!append) {
             postEntryEl.innerHTML = '';
-        }
+        } 
+
+        // add post on dom
         posts?.forEach((post) => {
             const divPostEl = document.createElement('div');
             const titleEl = document.createElement('h3');
@@ -220,11 +221,30 @@
         paginationEl.appendChild(paginationCountEl)
 
     }
+
+    function preventDuplicatedPostOnSearchButton() {
+        const select = form.querySelector('select');
+        // prevent duplicated posts
+        console.log(select.value, params.get('category'))
+        if(select.value === params.get('category')) {
+            form.querySelector('button[type="submit"]').disabled = true;
+        }
+        select.onchange = (e) => {
+            const {value} = e.target;
+            if(value === params.get('category')) {
+                form.querySelector('button[type="submit"]').disabled = true;
+            } else {
+                form.querySelector('button[type="submit"]').disabled = false;
+
+            }
+        }
+    }
     
     document.addEventListener('DOMContentLoaded', async () => {
         loadCategories();
         await loadPosts();
         search();
+        preventDuplicatedPostOnSearchButton();        
     });
 </script>
 
