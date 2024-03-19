@@ -1,8 +1,8 @@
- <div class="container">
-    <h5 class="title-noticia" style="margin-top: 25px;">Titulo </h5>
+<div class="container">
+    <h5 class="title-noticia" style="margin-top: 25px;"><?= $search_title;  ?> </h5>
     <div id="content_posts">
         <form id="get_posts" method="get">
-            <input type="search" name="keyword" placeholder="Digite sua busca...">
+            <input type="search" name="keyword" placeholder="Palavras-Chave">
             <select name="category">
                 <option value="">Aguarde...</option>
             </select>
@@ -26,7 +26,7 @@
     const perPage = 8;
     const params = new URLSearchParams(window.location.search);
     const postEntryEl = document.querySelector('.post-entry');
-    let currentCategory = '';
+    let currentCategory = '<?= $search_name;  ?>'
 
     function loadCategories() {
         const categoryIn = document.querySelector('select[name="category"]');
@@ -103,6 +103,7 @@
             
             if(params.get('category') !== currentCategory) {
                 currentCategory = params.get('category');
+                params.set('page_num', '1');
                 append = false;
             }
             postLoadingEl.style.display = 'none';
@@ -230,6 +231,32 @@
 <style>
     #content_posts {
         
+    }
+
+    #get_posts input,
+    #get_posts button,
+    #get_posts select {
+        padding: 0.8rem;
+    }
+
+    #get_posts select {
+        text-transform: capitalize;
+    }
+
+    #get_posts button {
+        border: none;
+        background-color: #1F90BD;
+        color: #fff;
+        border-radius: 3px;
+        padding: 0.8rem 1.5rem;
+    }
+
+    #get_posts input,
+    #get_posts select {
+        border-radius: 3px 0 0 3px;
+        border: 1px solid #e8e2e2;
+        outline: none;
+        padding: 0.8rem;
     }
 
     #content_posts .pagination {
