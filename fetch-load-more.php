@@ -1,5 +1,5 @@
 <div class="container">
-    <h5 class="title-noticia" style="margin-top: 25px;">title </h5>
+    <h5 class="title-noticia" style="margin-top: 25px;"><?= $search_title;  ?> </h5>
     <div id="content_posts">
         <form id="get_posts" method="get">
             <input type="search" name="keyword" placeholder="Palavras-Chave">
@@ -27,7 +27,7 @@
     const perPage = 8;
     const params = new URLSearchParams(window.location.search);
     const postEntryEl = document.querySelector('.post-entry');
-    let currentCategory = ''
+    let currentCategory = '<?= $search_name;  ?>'
 
     function loadCategories() {
         const categoryIn = document.querySelector('select[name="category"]');
@@ -82,7 +82,7 @@
     async function loadPosts(options) {
         
         params.set('target', 'posts');
-        params.set('page_num', params.get('page_num') == '-1' ? '1' : Number(params.get('page_num')) + 1);
+        params.set('page_num', params.get('page_num') == '0' ? '1' : Number(params.get('page_num')) + 1);
         params.set('per_page', options?.perPage ? options.perPage : params.get('per_page') ? params.get('per_page') : perPage);
 
         if(options?.searchName) params.set('search_name', options?.searchName );
@@ -103,7 +103,7 @@
             
             if(params.get('category') !== currentCategory) {
                 currentCategory = params.get('category');
-                params.set('page_num', '-1');
+                params.set('page_num', '0');
                 append = false;
             }
             postLoadingEl.style.display = 'none';
