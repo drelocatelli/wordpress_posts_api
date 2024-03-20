@@ -1,5 +1,5 @@
 <div class="container">
-    <h5 class="title-noticia" style="margin-top: 25px;">title</h5>
+    <h5 class="title-noticia" style="margin-top: 25px;"><?= $search_title;  ?> </h5>
     <div id="content_posts">
         <form id="get_posts" method="get">
             <input type="search" name="keyword" placeholder="Palavras-Chave">
@@ -10,7 +10,7 @@
         </form>
         <div id="posts">
             <div class="post-loading">
-                Carregando...
+                <p style="text-align:center;"><br /><br /><i class="fa fa-spinner fa-spin fa-2x fa-fw"></i><br /><br /></p>
             </div>
             <div class="post-entry">
             </div>
@@ -27,7 +27,7 @@
     const perPage = 8;
     const params = new URLSearchParams(window.location.search);
     const postEntryEl = document.querySelector('.post-entry');
-    let currentCategory = ''
+    let currentCategory = '<?= $search_name;  ?>'
 
     function loadCategories() {
         const categoryIn = document.querySelector('select[name="category"]');
@@ -79,10 +79,17 @@
         }
     }
 
-    async function loadPosts(options) {
-        
+    async function loadPosts(options, isFirstTime = false) {
+
         params.set('target', 'posts');
-        params.set('page_num', params.get('page_num') ? Number(params.get('page_num')) + 1 : 1);
+
+        // prevent sum pageNum when reload page
+        if(isFirstTime) {
+            params.set('page_num', 1);
+        } else {
+            params.set('page_num', params.get('page_num') ? Number(params.get('page_num')) + 1 : 1);
+        }
+        
         params.set('per_page', options?.perPage ? options.perPage : params.get('per_page') ? params.get('per_page') : perPage);
 
         if(options?.searchName) params.set('search_name', options?.searchName );
@@ -94,7 +101,7 @@
         
         try {
             postLoadingEl.style.display = 'block';
-            postLoadingEl.innerHTML = 'Carregando...';
+            postLoadingEl.innerHTML = '<p style="text-align:center;"><br /><br /><i class="fa fa-spinner fa-spin fa-2x fa-fw"></i><br /><br /></p>';
 
             let response = await fetch(`<?= site_url(); ?>/api?${params.toString()}`);
             response = await response.json();
@@ -242,7 +249,7 @@
     
     document.addEventListener('DOMContentLoaded', async () => {
         loadCategories();
-        await loadPosts();
+        await loadPosts(null, true);
         search();
         preventDuplicatedPostOnSearchButton();        
     });
