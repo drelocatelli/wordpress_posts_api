@@ -21,6 +21,7 @@
 <script>
     postLoadingEl = document.querySelector('.post-loading');
     params = new URLSearchParams(window.location.search);
+    let perPage = 5;
 
     async function loadPosts(options) {
         
@@ -188,7 +189,6 @@
     }
     
     document.addEventListener('DOMContentLoaded', async () => {
-        loadCategories();
         await loadPosts();
         search();
     });
