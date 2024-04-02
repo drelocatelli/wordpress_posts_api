@@ -1,87 +1,39 @@
-<div id="content_posts">
-    <form id="get_posts" method="get">
-        <input type="search" name="keyword" placeholder="Digite sua busca...">
-        <select name="category">
-            <option value="">Aguarde...</option>
-        </select>
-        <button type="submit">Buscar</button>
-    </form>
-    <div id="posts">
-        <div class="post-entry">
-            <div class="post-loading">
-                Carregando...
-            </div>
-            <div class="post">
-            </div>
-        </div>
-        <div class="pagination">
-            
+<div class="secao">
+    <div class="container">
+        <h5 class="title-noticia" style="margin-top: 55px;">Notícias</h5>
+        <div class="content_posts">
+            <div id="posts">
+                <div class="post-entry">
+                    <div class="post-loading">
+                        Carregando...
+                    </div>
+                    <div class="post">
+                    </div>
+                </div>
+                <div class="pagination">
+                    
+                </div>
         </div>
     </div>
+
+    </div>
 </div>
-
-
 <script>
-    const postLoadingEl = document.querySelector('.post-loading');
-    const perPage = 2;
-    const params = new URLSearchParams(window.location.search);
-
-    function loadCategories() {
-        const categoryIn = document.querySelector('select[name="category"]');
-        fetch('<?= site_url(); ?>/api?target=categories')
-            .then((response) => response.json())
-            .then((response) => {
-                categoryIn.innerHTML = '';
-                response.forEach((category) => {
-                    categoryIn.add(new Option(category.name, category.name));
-                })
-            })
-            .catch((err) => {
-                categoryIn.querySelector('option').innerText = 'Ocorreu um erro';
-                console.error(err);
-            })
-    }
-    
-    async function search(e) {
-        const form = document.querySelector('form#get_posts');
-        form.onsubmit = async(e) => {
-            e.preventDefault();
-            
-            const data = new FormData(form);
-            const keyword = data.get('keyword');
-            const category = data.get('category');
-            
-            const params = new URLSearchParams(window.location.search);
-            params.set('target', 'posts');
-            if (category) params.set('category', category);
-            if (keyword) {
-                params.set('search_name', keyword)
-            } else {
-                params.delete('search_name');
-            }
-
-            const newParamsString = params.toString();
-            const newURL = newParamsString ? `${window.location.pathname}?${newParamsString}` : window.location.pathname;
-            history.pushState(null, '', newURL);
-
-            await loadPosts({
-                pageNum: -1,
-                searchName: keyword,
-                perPage: keyword.length !== 0 ? -1 : perPage,
-                category,
-            });
-            
-        }
-    }
+    postLoadingEl = document.querySelector('.post-loading');
+    params = new URLSearchParams(window.location.search);
 
     async function loadPosts(options) {
         
+        console.log(params.get('category'))
         params.set('target', 'posts');
         params.set('page_num', options?.pageNum ? options.pageNum : params.get('page_num') ? params.get('page_num') : 1);
         params.set('per_page', options?.perPage ? options.perPage : params.get('per_page') ? params.get('per_page') : perPage);
 
         if(options?.searchName) params.set('search_name', options?.searchName );
-        if(options?.category) params.set('category', options.category );
+        if(options?.category) { 
+            params.set('category', options.category );
+        }
+        // document.querySelector('category')?.innerHTML = params.get('category') ?? 'sem categoria';
         
         try {
             postLoadingEl.innerHTML = 'Carregando...';
@@ -116,16 +68,13 @@
             const dateEL = document.createElement('p');
 
             divPostEl.classList.add('post');
-            contentEl.classList.add('post-content');
             dateEL.classList.add('post-date');
+            contentEl.classList.add('post-content');
 
+            const postTitleEntry = document.createElement('div');
+            postTitleEntry.classList.add('post-header');
             titleEl.innerHTML = post?.title;
-            contentEl.innerHTML = post?.excerpt;
-            dateEL.innerHTML = post?.date;
-            thumbnailEl.innerHTML = post?.thumbnail;
-            
-            divPostEl.appendChild(titleEl);
-            divPostEl.appendChild(thumbnailEl);
+            titleEl.classList.add('post-title');
             let date = new Date(post?.date);
             date = new Date(date.getTime() - (3 * 60 * 60 * 1000));
             date = date.toLocaleString('pt-BR', { 
@@ -140,6 +89,14 @@
             });
 
             dateEL.innerHTML = date;
+            contentEl.innerHTML = post?.excerpt;
+            thumbnailEl.innerHTML = post?.thumbnail;
+
+            postTitleEntry.appendChild(titleEl)
+            postTitleEntry.appendChild(dateEL)
+            
+            divPostEl.appendChild(postTitleEntry);
+            divPostEl.appendChild(thumbnailEl);
             divPostEl.appendChild(contentEl);
             divPostEl.innerHTML = `<a href="${post?.permalink}">${divPostEl.innerHTML}</a>`;
 
@@ -149,27 +106,66 @@
     }
 
     async function makePagination(pagination, length) {
-        const paginationEl = document.querySelector('#content_posts .pagination');
+        const paginationEl = document.querySelector('.content_posts .pagination');
         paginationEl.innerHTML = '';
 
-        const totalPages = Math.ceil(pagination?.total_posts / pagination.per_page) ?? 0;
-        
-        for (let i = 1; i <= totalPages; i++) {
+        const totalPages = Math.ceil(pagination?.total_posts / pagination?.per_page) ?? 0;
+        const currentPage = Number(pagination.current_page);
+
+        if (totalPages === 0) {
+            postLoadingEl.innerHTML = 'Nenhum post encontrado';
+        } else {
+            postLoadingEl.innerHTML = '';
+        }
+
+        const visiblePages = 5; // Define quantas páginas visíveis queremos mostrar
+
+        let startPage = currentPage - Math.floor(visiblePages / 2);
+        startPage = Math.max(startPage, 1); // Garante que startPage não seja menor que 1
+
+        let endPage = startPage + visiblePages - 1;
+        endPage = Math.min(endPage, totalPages); // Garante que endPage não seja maior que totalPages
+
+        if (endPage - startPage < visiblePages - 1) {
+            startPage = Math.max(1, endPage - visiblePages + 1);
+        }
+
+        if (currentPage > 1) {
+            const prevPageItem = document.createElement('a');
+            prevPageItem.innerText = '<';
+            prevPageItem.dataset.pageNum = currentPage - 1;
+            prevPageItem.href = "javascript:void(0);";
+            prevPageItem.classList.add('page');
+            paginationEl.appendChild(prevPageItem);
+        }
+
+        for (let i = startPage; i <= endPage; i++) {
             const pageItem = document.createElement('a');
             pageItem.innerText = i;
+            pageItem.dataset.pageNum = i;
             pageItem.href = "javascript:void(0);";
             pageItem.classList.add('page');
 
-            if (i === Number(pagination.current_page)) {
+            if (i === currentPage) {
                 pageItem.classList.add('active');
             }
 
             paginationEl.appendChild(pageItem);
         }
 
+        if (currentPage < totalPages) {
+            const nextPageItem = document.createElement('a');
+            nextPageItem.href = "javascript:void(0);";
+            nextPageItem.classList.add('page');
+            nextPageItem.innerHTML = '>';
+            nextPageItem.dataset.pageNum = currentPage + 1;
+            paginationEl.appendChild(nextPageItem);
+
+        }
+
         makePageLink(paginationEl, length);
-        
     }
+
 
     function makePageLink(paginationEl, length) {
         // make page link
@@ -179,7 +175,8 @@
                 params.set('per_page', params.get('per_page'));
                 const newParamsString = params.toString();
 
-                await loadPosts({ pageNum: link.innerText });
+                console.log('link', link.dataset.pageNum)
+                await loadPosts({ pageNum: link.dataset.pageNum });
             });
         });
 
@@ -198,47 +195,23 @@
 </script>
 
 <style>
-    #content_posts {
-        
+    .pagination a {
+        background: #cdcdcd;
+        color: #fff;
+        padding: 5px 16px;
+        border-radius: 5px;
     }
 
-    #content_posts .pagination {
-        display: flex;
-        flex-direction: row;
+    .pagination a:hover {
+        opacity: 0.8;
     }
-    #content_posts .pagination div {
-        margin-left: 6px;
+
+    .pagination a.active {
+        background: #20745f;
 
     }
 
-    #content_posts #posts {
-        display: flex;
-        flex-direction: column;
-        gap: 2rem;
-    }
-    
-    #content_posts .post-entry {
-        display: flex;
-        flex-direction: row;
+    .pagination {
         flex-wrap: wrap;
-        gap: 1rem;
-    }
-
-    #content_posts .post-entry .post {
-        width: 200px;
-    }
-
-    #content_posts .post-entry .post img {
-        width: 200px;
-        height: 150px;
-        object-fit: cover;
-    }
-
-    #content_posts .post-content {
-        display: -webkit-box;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        -webkit-line-clamp: 3;
-        -webkit-box-orient: vertical;
     }
 </style>
